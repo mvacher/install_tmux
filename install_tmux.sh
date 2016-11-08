@@ -6,6 +6,11 @@
 
 # Modified from https://gist.github.com/ryin/3106801 and https://gist.github.com/ryin/3106801 to use the latest version from github.
 
+TARGET_DIR="$HOME/.local"
+TMP_DIR="$HOME/tmp_tmux"
+# Variable version #
+TMUX_VERSION=2.2
+# For some reason the 2.3 version didn't work..
 
 # exit on error
 set -e
@@ -20,12 +25,19 @@ get_from_github () {
 }
 
 # create our directories
-mkdir -p $HOME/local $HOME/tmux_tmp
-cd $HOME/tmux_tmp
+mkdir -p $TMP_DIR
+cd $TMP_DIR
 
 # download source files for tmux, libevent, and ncurses
-get_from_github tmux
-get_from_github libevent
+#get_from_github tmux
+#get_from_github libevent
+# GEt tmux
+wget -O tmux-${TMUX_VERSION}.tar.gz https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz
+tar xvzf tmux-${TMUX_VERSION}.tar.gz
+# Get libevent
+wget https://github.com/downloads/libevent/libevent/libevent-2.0.19-stable.tar.gz
+tar xvzf libevent-2.0.19-stable.tar.gz
+# ncurse
 curl -L ftp://ftp.gnu.org/gnu/ncurses/ncurses-6.0.tar.gz -o ncurses.tar.gz
 tar xvzf ncurses.tar.gz
 
@@ -34,30 +46,33 @@ tar xvzf ncurses.tar.gz
 #########################
 
 # libevent
-cd $HOME/tmux_tmp/libevent*
+cd $TMP_DIR/libevent*
 ./autogen.sh
-./configure --prefix=$HOME/local --disable-shared
+./configure --prefix=$TARGET_DIR --disable-shared
 make -j2
 make install
 
 # ncurses
-cd $HOME/tmux_tmp/ncurses-*
-./configure --prefix=$HOME/local --without-debug --without-shared --without-normal --without-ada
+cd $TMP_DIR/ncurses-*
+./configure --prefix=$TARGET_DIR --without-debug --without-shared
 make -j2
 make install
 
 # tmux
-cd $HOME/tmux_tmp/tmux*
+cd $TMP_DIR/tmux-${TMUX_VERSION}
 ./autogen.sh
-./configure CFLAGS="-I$HOME/local/include -I$HOME/local/include/ncurses" LDFLAGS="-L$HOME/local/lib -L$HOME/local/include/ncurses -L$HOME/local/include"
-CPPFLAGS="-I$HOME/local/include -I$HOME/local/include/ncurses" LDFLAGS="-static -L$HOME/local/include -L$HOME/local/include/ncurses -L$HOME/local/lib"
+./configure --prefix=$TARGET_DIR CFLAGS="-I$TARGET_DIR/include -I$TARGET_DIR/include/ncurses" LDFLAGS="-L$TARGET_DIR/lib -L$TARGET_DIR/include/ncurses -L$TARGET_DIR/include" 
+#CPPFLAGS="-I$TARGET_DIR/include -I$TARGET_DIR/include/ncurses" LDFLAGS="-static -L$TARGET_DIR/include -L$TARGET_DIR/include/ncurses -L$TARGET_DIR/lib"
+
+# Move #
 make -j2
-cp tmux $HOME/local/bin
+cp tmux $TARGET_DIR/bin
 
 # cleanup
-rm -rf $HOME/tmux_tmp
+cd
+rm -rf $TMP_DIR
 
-echo "$HOME/local/bin/tmux is now available. You can optionally add $HOME/local/bin to your PATH."
+echo "$TARGET_DIR/bin/tmux is now available. You can optionally add $TARGET_DIR/bin to your PATH."
 # e.g. to export path
 # export PATH=$PATH:/path/to/dir1
 
