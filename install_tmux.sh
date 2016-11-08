@@ -31,7 +31,7 @@ cd $TMP_DIR
 # download source files for tmux, libevent, and ncurses
 #get_from_github tmux
 #get_from_github libevent
-# GEt tmux
+# Get tmux
 wget -O tmux-${TMUX_VERSION}.tar.gz https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz
 tar xvzf tmux-${TMUX_VERSION}.tar.gz
 # Get libevent
@@ -60,9 +60,7 @@ make install
 
 # tmux
 cd $TMP_DIR/tmux-${TMUX_VERSION}
-./autogen.sh
 ./configure --prefix=$TARGET_DIR CFLAGS="-I$TARGET_DIR/include -I$TARGET_DIR/include/ncurses" LDFLAGS="-L$TARGET_DIR/lib -L$TARGET_DIR/include/ncurses -L$TARGET_DIR/include" 
-#CPPFLAGS="-I$TARGET_DIR/include -I$TARGET_DIR/include/ncurses" LDFLAGS="-static -L$TARGET_DIR/include -L$TARGET_DIR/include/ncurses -L$TARGET_DIR/lib"
 
 # Move #
 make -j2
